@@ -2,6 +2,14 @@
 
 ##Usage
 
-1. Install phantomjs:
-    1. OS X: brew install phantomjs
-2. 
+
+
+## Requirements
+
+### pip
+
+see requirements.txt
+
+### brew
+
+brew install phantomjs
