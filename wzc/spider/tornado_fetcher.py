@@ -9,6 +9,8 @@ import tornado.httpclient
 from tornado.curl_httpclient import CurlAsyncHTTPClient
 import tornado.ioloop
 
+from wzc.wzc.settings import PHANTOM_SERVER,TIME_OUT
+
 
 def text(obj, encoding='utf-8'):
     if isinstance(obj, unicode):
@@ -28,10 +30,10 @@ class Fetcher(object):
         'headers': {},
         'allow_redirects': True,
         'use_gzip': True,
-        'timeout': 120,
+        'timeout': TIME_OUT,
     }
 
-    def __init__(self, phantomjs_proxy='http://localhost:25555', user_agent='', pool_size=100, async=False):
+    def __init__(self, phantomjs_proxy=PHANTOM_SERVER, user_agent='', pool_size=100, async=False):
         self.phantomjs_proxy = phantomjs_proxy
         self.user_agent = user_agent
         self.async = async
@@ -108,7 +110,14 @@ class Fetcher(object):
         except Exception as e:
             return handle_error(e)
 
+def update_url(url):
+    fetcher = Fetcher()
+    res = fetcher.phantomjs_fetch(url)
+    print res
+    print dir(res)
+    print type(res)
+
+
 
 if __name__ == '__main__':
-    fetcher = Fetcher()
-    res = fetcher.phantomjs_fetch('http://www.baidu.com')
+    update_url('http://www.baidu.com')

@@ -2,10 +2,7 @@
 import sys
 from os.path import abspath, join, dirname
 
-wzc_fir = join(abspath(dirname('__file__')), '../../wzc')
-sys.path.insert(0, wzc_fir)
-
-from spider.tornado_fetcher import Fetcher
+from wzc.spider.tornado_fetcher import Fetcher
 from settings import PHANTOM_SERVER, BASE_URL
 
 
