@@ -6,10 +6,5 @@
 
 ## Requirements
 
-### pip
-
-see requirements.txt
-
-### brew
-
 brew install phantomjs
+pip install -r requirements.txt

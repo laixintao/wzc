@@ -101,5 +101,3 @@ ENV/
 .idea/modules.xml
 .idea/workspace.xml
 .idea/wzc.iml
-requirements.txt
-test/
