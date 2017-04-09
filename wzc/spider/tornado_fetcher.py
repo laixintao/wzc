@@ -9,7 +9,7 @@ import tornado.httpclient
 from tornado.curl_httpclient import CurlAsyncHTTPClient
 import tornado.ioloop
 
-from wzc.wzc.settings import PHANTOM_SERVER,TIME_OUT
+from wzc.wzc.settings import PHANTOM_SERVER, TIME_OUT
 
 
 def text(obj, encoding='utf-8'):
@@ -110,13 +110,16 @@ class Fetcher(object):
         except Exception as e:
             return handle_error(e)
 
+
 def update_url(url):
+    '''
+
+    :param url:
+    :return: res [u'cookies', u'url', u'orig_url', u'time', u'content', u'headers', u'status_code', u'js_script_result']
+    '''
     fetcher = Fetcher()
     res = fetcher.phantomjs_fetch(url)
-    print res
-    print dir(res)
-    print type(res)
-
+    return res
 
 
 if __name__ == '__main__':
