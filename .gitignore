@@ -102,3 +102,4 @@ ENV/
 .idea/workspace.xml
 .idea/wzc.iml
 /wzc/download.html
+/data/
