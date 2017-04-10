@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import BaseHTTPServer
+from wzc.storage import page_table
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -9,9 +10,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.page = self.create_page()
         self.send_content()
 
-
     def create_page(self):
-        pass
+        page_info = page_table.find_one({'path': self.path})
+        return page_info['content'].encode('utf-8')
 
     def send_content(self):
         self.send_response(200)

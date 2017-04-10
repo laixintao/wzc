@@ -2,13 +2,15 @@
 
 import pymongo
 import hashlib
+from urlparse import urlparse
 
+conn = pymongo.MongoClient()
+page_table = conn['wzc']['page']
 
 class MongodbStorage(object):
     def __init__(self):
         self.page_info = {}
-        conn = pymongo.MongoClient()
-        self.db = conn['wzc']['page']
+        self.db = page_table
 
     def save(self, result):
         '''
@@ -20,6 +22,9 @@ class MongodbStorage(object):
         html = result.get('content')
         hash_md5 = hashlib.md5(html.encode('utf-8')).hexdigest()
         result['md5'] = hash_md5
+        url_scheme = urlparse(result.get('url'))
+        result['netloc'] = url_scheme.netloc
+        result['path'] = url_scheme.path
         self.db.insert(result) #TODO update
         return hash_md5
 
