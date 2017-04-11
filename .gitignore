@@ -103,3 +103,4 @@ ENV/
 .idea/wzc.iml
 /wzc/download.html
 /data/
+*.swp
