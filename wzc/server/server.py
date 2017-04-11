@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import BaseHTTPServer
 from wzc.storage import page_table
+from wzc.wzc.settings import HTML_PATH
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -12,7 +13,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def create_page(self):
         page_info = page_table.find_one({'path': self.path})
-        return page_info['content'].encode('utf-8')
+        filename = page_info['md5']
+        with open('{}{}.html'.format(HTML_PATH, filename), 'r') as f:
+            content = f.read()
+            return content
 
     def send_content(self):
         self.send_response(200)

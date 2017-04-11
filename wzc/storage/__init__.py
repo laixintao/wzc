@@ -7,6 +7,7 @@ from urlparse import urlparse
 conn = pymongo.MongoClient()
 page_table = conn['wzc']['page']
 
+
 class MongodbStorage(object):
     def __init__(self):
         self.page_info = {}
@@ -25,10 +26,12 @@ class MongodbStorage(object):
         url_scheme = urlparse(result.get('url'))
         result['netloc'] = url_scheme.netloc
         result['path'] = url_scheme.path
-        self.db.insert(result) #TODO update
+        del result['content']
+        self.db.update({'path': result['path']},
+                       {'$set': result}, upsert=True)  # TODO update
         return hash_md5
 
 
 if __name__ == '__main__':
     db = MongodbStorage()
-    db.save({'nihao':'你好'})
+    db.save({'nihao': '你好'})
