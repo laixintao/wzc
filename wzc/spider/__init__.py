@@ -49,8 +49,8 @@ def update_url(url):
     content = res['content']
     mongo = MongodbStorage()
     filename = mongo.save(res)
-    with open('{}{}.html'.format(HTML_PATH, filename), 'w') as f:
-        f.write(content.encode('utf-8'))
+    with open('{}{}.html'.format(HTML_PATH, filename), 'w') as html_file:
+        html_file.write(content.encode('utf-8'))
     more_urls = extract_urls(content)
     return more_urls
 

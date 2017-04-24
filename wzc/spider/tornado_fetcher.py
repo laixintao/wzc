@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
+"""
+phantomjs fetcher
+"""
+from __future__ import unicode_literals, print_function
 
-import logging
 import copy
 import json
 import time
 
 import tornado.httpclient
-from tornado.curl_httpclient import CurlAsyncHTTPClient
 import tornado.ioloop
 
 from wzc.wzc.settings import PHANTOM_SERVER, TIME_OUT
 
 
-def text(obj, encoding='utf-8'):
-    if isinstance(obj, unicode):
-        return obj.encode(encoding)
-    return obj
-
-
-def unicode_obj(obj, encoding='utf-8'):
-    if isinstance(obj, str):
-        return obj.decode(encoding)
-    return obj
-
 
 class Fetcher(object):
+    """ pahntomjs fetcher """
     default_options = {
         'method': 'GET',
         'headers': {},
@@ -37,13 +29,13 @@ class Fetcher(object):
         self.phantomjs_proxy = phantomjs_proxy
         self.user_agent = user_agent
         self.async = async
-        if self.async:
-            self.http_client = CurlAsyncHTTPClient(max_clients=pool_size, io_loop=tornado.ioloop.IOLoop())
-        else:
-            self.http_client = tornado.httpclient.HTTPClient(max_clients=pool_size)
+        self.url = ""
+        # TODO support async
+        self.http_client = tornado.httpclient.HTTPClient(max_clients=pool_size)
 
     @staticmethod
     def parse_option(default_options, url, user_agent, **kwargs):
+        """ parse_option """
         fetch = copy.deepcopy(default_options)
         fetch['url'] = url
         fetch['headers']['User-Agent'] = user_agent
@@ -55,7 +47,10 @@ class Fetcher(object):
         return fetch
 
     def phantomjs_fetch(self, url, **kwargs):
+        """ main fetcher method """
+        self.url = url
         start_time = time.time()
+        fetch_resp = {'start_time': start_time}
         fetch = self.parse_option(self.default_options, url, user_agent=self.user_agent, **kwargs)
         request_conf = {
             'follow_redirects': False
@@ -63,51 +58,33 @@ class Fetcher(object):
         if 'timeout' in fetch:
             request_conf['connect_timeout'] = fetch['timeout']
             request_conf['request_timeout'] = fetch['timeout'] + 1
-
-        def handle_response(response):
-            if not response.body:
-                return handle_error(Exception('no response from phantomjs'))
-            try:
-                result = json.loads(text(response.body))
-                if response.error:
-                    result['error'] = text(response.error)
-            except Exception as e:
-                return handle_error(e)
-
-            if result.get('status_code', 200):
-                logging.info('[%d] %s %.2fs', result['status_code'], url, result['time'])
-            else:
-                logging.error('[%d] %s, %r %.2fs', result['status_code'],
-                              url, result['content'], result['time'])
-            return result
-
-        def handle_error(error):
-            result = {
-                'status_code': getattr(error, 'code', 599),
-                'error': unicode_obj(error),
-                'content': '',
-                'time': time.time() - start_time,
-                'orig_url': url,
-                'url': url,
-            }
-            logging.error('[%d] %s, %r %.2fs',
-                          result['status_code'], url, error, result['time'])
-            return result
-
         try:
-            request = tornado.httpclient.HTTPRequest(
-                url='%s' % self.phantomjs_proxy, method='POST',
-                body=json.dumps(fetch), **request_conf)
-            if self.async:
-                self.http_client.fetch(request, handle_response)
-            else:
-                return handle_response(self.http_client.fetch(request))
-        except tornado.httpclient.HTTPError as e:
-            if e.response:
-                return handle_response(e.response)
-            else:
-                return handle_error(e)
-        except Exception as e:
-            return handle_error(e)
+            request = tornado.httpclient.HTTPRequest(url=self.phantomjs_proxy, method='POST',
+                                                     body=json.dumps(fetch), **request_conf)
+            phantomjs_response = self.http_client.fetch(request)
+            result = json.loads(phantomjs_response.body)
+            result['status'] = 'success'
+        except Exception as error_info:
+            result = {'status_code': getattr(error_info, 'code', 599),
+                      'error_info': str(error_info),
+                      'content': '',
+                      'time': time.time() - start_time,
+                      'orig_url': url,
+                      'url': url,
+                      'status': 'error',
+                     }
+        finally:
+            fetch_resp = result.update(fetch_resp)
+        return fetch_resp
 
-
+if __name__ == '__main__':
+    test_url = "http://python-china.org/t/1257"
+    test_fetcher = Fetcher(
+        user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) '
+                   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+        # user agent
+        pool_size=10,  # max httpclient num
+        async=False
+    )
+    test_res = test_fetcher.phantomjs_fetch(test_url)
+    print(test_res)
