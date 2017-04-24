@@ -9,5 +9,6 @@ PHANTOM_SERVER = '{host}:{port}'.format(host=PHANTOMJS_HOST, port=PHANTOMJS_PORT
 
 BASE_URL = 'http://python-china.org'
 
-HTML_PATH = '/Users/laixintao/Documents/wzc/data/'  # absolute path
+# HTML_PATH = '/Users/laixintao/Documents/wzc/data/'  # absolute path
+HTML_PATH = '/opt/html/'  # absolute path
 HOSTS = ['www.python-china.org', 'python-china.org', 'http://www.python-china.org', 'http://python-china.org']
