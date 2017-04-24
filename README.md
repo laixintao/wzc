@@ -23,3 +23,7 @@ sudo apt-get install python-dev
 - docker
 - nginx support
 - html diff
+- #
+- 禁止ajax src等
+- 完成爬虫任务队列
+- 完成不存在页面的自动抓取

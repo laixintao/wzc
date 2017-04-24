@@ -111,16 +111,3 @@ class Fetcher(object):
             return handle_error(e)
 
 
-def update_url(url):
-    '''
-
-    :param url:
-    :return: res [u'cookies', u'url', u'orig_url', u'time', u'content', u'headers', u'status_code', u'js_script_result']
-    '''
-    fetcher = Fetcher()
-    res = fetcher.phantomjs_fetch(url)
-    return res
-
-
-if __name__ == '__main__':
-    update_url('http://www.baidu.com')
