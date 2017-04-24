@@ -6,6 +6,12 @@ PHANTOMJS_PORT = 12306
 TIME_OUT = 50
 PHANTOMJS_HOST = 'http://localhost'
 PHANTOM_SERVER = '{host}:{port}'.format(host=PHANTOMJS_HOST, port=PHANTOMJS_PORT)
+# phantomjs will run this function first,
+# you can use this function to remove some elements that changed frenquently.
+# like "publish at xxx days ago"
+PHANTOM_INIT_FUNCTION = "" 
+
+PHANTOM_WZC_FUNCTION = 'wzc_run'
 
 BASE_URL = 'http://python-china.org'
 
