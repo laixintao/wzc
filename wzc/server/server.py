@@ -5,7 +5,7 @@ wzc_server
 """
 import BaseHTTPServer
 from wzc.storage import page_table
-from wzc.wzc.settings import HTML_PATH
+from wzc.wzc.settings import HTML_PATH, IGNORE_PATH
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -13,7 +13,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """handle get method"""
-        self.log_message("[GET]-SUCCESS\t: {}".format(self.path))
+        if self.path in IGNORE_PATH:
+            return
         self.page = self.create_page()
         self.send_content()
 
@@ -28,9 +29,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             filename = page_info['md5']
             with open('{}{}.html'.format(HTML_PATH, filename), 'r') as html_file:
                 content = html_file.read()
+                self.log_message("[GET]-SUCCESS\t: {}".format(self.path))
                 return content
         else:
-            self.log_error("[GET]-FAIL\t:Not downloaded yet!")
+            self.log_error("[GET]-FAIL   \t: {}Not downloaded yet!".format(self.path))
             return ""
 
     def send_content(self):
