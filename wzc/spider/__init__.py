@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
+import urllib
+import re
 from tornado_fetcher import Fetcher
 from wzc.storage import MongodbStorage
 from wzc.wzc.settings import HTML_PATH, HOSTS
-import urllib
-
-import re
-
 
 def check_url(url):
     protocol, s1 = urllib.splittype(url)

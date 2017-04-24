@@ -4,6 +4,7 @@ phantomjs fetcher
 """
 from __future__ import unicode_literals, print_function
 
+import logging
 import copy
 import json
 import time
@@ -13,6 +14,12 @@ import tornado.ioloop
 
 from wzc.wzc.settings import PHANTOM_SERVER, TIME_OUT
 
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='spider.log',
+                    filemode='w')
 
 
 class Fetcher(object):
@@ -64,7 +71,9 @@ class Fetcher(object):
             phantomjs_response = self.http_client.fetch(request)
             result = json.loads(phantomjs_response.body)
             result['status'] = 'success'
+            logging.info("success fetch url: {}".format(self.url))
         except Exception as error_info:
+            logging.error(error_info)
             result = {'status_code': getattr(error_info, 'code', 599),
                       'error_info': str(error_info),
                       'content': '',
@@ -74,8 +83,9 @@ class Fetcher(object):
                       'status': 'error',
                      }
         finally:
-            fetch_resp = result.update(fetch_resp)
-        return fetch_resp
+            logging.info("result: {}, fetch_resp: {}".format(result, fetch_resp))
+            result.update(fetch_resp)
+        return result
 
 if __name__ == '__main__':
     test_url = "http://python-china.org/t/1257"

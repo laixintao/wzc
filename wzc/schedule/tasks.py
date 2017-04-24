@@ -15,5 +15,7 @@ wzc_spider = Celery('wzc', broker='redis://localhost')
 def update(url):
     """url update task"""
     more_urls = update_url(url)
+    if more_urls is None:
+        return
     for url in more_urls:
         update.delay(BASE_URL+url)
