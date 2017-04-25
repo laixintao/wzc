@@ -10,6 +10,10 @@ brew install phantomjs
 brew install mongodb
 pip install -r requirements.txt
 
+### Linux
+lxml
+sudo apt-get install libcurl4-openssl-dev
+sudo apt-get install python-dev
 ## Todo
 
 - web server, wsgi suport

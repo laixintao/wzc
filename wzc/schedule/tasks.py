@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=C0103
+
+"""
+managing spider tasks.
+"""
 
 from celery import Celery
 from wzc.spider import update_url
 from wzc.wzc.settings import BASE_URL
 
-app = Celery('wzc', broker='redis://localhost')
+wzc_spider = Celery('wzc', broker='redis://localhost')
 
-
-@app.task
-def add(x, y):
-    return x + y
-
-
-@app.task
+@wzc_spider.task
 def update(url):
+    """url update task"""
     more_urls = update_url(url)
     for url in more_urls:
         update.delay(BASE_URL+url)
