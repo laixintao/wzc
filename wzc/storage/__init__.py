@@ -28,7 +28,10 @@ class MongodbStorage(object):
         result['netloc'] = url_scheme.netloc
         result['path'] = url_scheme.path
         del result['content']
-        target_db = self.page
+        if result['status'] == 'success':
+            target_db = self.page
+        else:
+            target_db = self.fail_page
         target_db.update({'path': result['path']},
                          {'$set': result}, upsert=True)
         return hash_md5
