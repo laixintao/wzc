@@ -6,12 +6,13 @@ from urlparse import urlparse
 
 conn = pymongo.MongoClient()
 page_table = conn['wzc']['page']
-
+fail_page = conn['wzc']['fail_page']
 
 class MongodbStorage(object):
     def __init__(self):
         self.page_info = {}
-        self.db = page_table
+        self.page = page_table
+        self.fail_page = fail_page
 
     def save(self, result):
         '''
@@ -27,8 +28,9 @@ class MongodbStorage(object):
         result['netloc'] = url_scheme.netloc
         result['path'] = url_scheme.path
         del result['content']
-        self.db.update({'path': result['path']},
-                       {'$set': result}, upsert=True)  # TODO update
+        target_db = self.page
+        target_db.update({'path': result['path']},
+                         {'$set': result}, upsert=True)
         return hash_md5
 
 

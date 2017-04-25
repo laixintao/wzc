@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from tornado_fetcher import Fetcher
 from wzc.storage import MongodbStorage
 from wzc.wzc.settings import HTML_PATH, HOSTS
