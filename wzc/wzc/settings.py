@@ -14,3 +14,6 @@ HTML_PATH = '/opt/html/'  # absolute path
 HOSTS = ['www.python-china.org', 'python-china.org', 'http://www.python-china.org', 'http://python-china.org']
 
 IGNORE_PATH = ['/favicon.ico',]
+
+MIN_UPDATE_TIME = 300
+MAX_RETRY = 5

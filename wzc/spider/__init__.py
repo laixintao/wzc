@@ -52,8 +52,11 @@ def update_url(url):
     filename = mongo.save(res)
     with open('{}{}.html'.format(HTML_PATH, filename), 'w') as f:
         f.write(content.encode('utf-8'))
-    more_urls = extract_urls(content)
-    return more_urls
+    if res['status'] == 'success':
+        more_urls = extract_urls(content)
+        return more_urls
+    else:
+        return []
 
 
 if __name__ == '__main__':

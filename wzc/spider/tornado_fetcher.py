@@ -9,7 +9,10 @@ import tornado.httpclient
 from tornado.curl_httpclient import CurlAsyncHTTPClient
 import tornado.ioloop
 
-from wzc.wzc.settings import PHANTOM_SERVER, TIME_OUT
+from wzc.wzc.settings import PHANTOM_SERVER, TIME_OUT, MIN_UPDATE_TIME
+from wzc.storage import page_table
+
+logger = logging.getLogger(__name__)
 
 
 def text(obj, encoding='utf-8'):
@@ -54,7 +57,17 @@ class Fetcher(object):
         fetch['load_images'] = kwargs.get('load_images', False)
         return fetch
 
+    def check_need_update(self, url):
+        page_info = page_table.find_one({'path': url})
+        now_time = time.time()
+        if now_time - page_info['last_update'] < MIN_UPDATE_TIME:
+            logger.debug('trying to update url {}, but not out {}'.format(url, MIN_UPDATE_TIME))
+            return False
+        return True
+
     def phantomjs_fetch(self, url, **kwargs):
+        if not self.check_need_update(url):
+            return
         start_time = time.time()
         fetch = self.parse_option(self.default_options, url, user_agent=self.user_agent, **kwargs)
         request_conf = {
@@ -65,6 +78,7 @@ class Fetcher(object):
             request_conf['request_timeout'] = fetch['timeout'] + 1
 
         def handle_response(response):
+            """handle response, this function must be called."""
             if not response.body:
                 return handle_error(Exception('no response from phantomjs'))
             try:
@@ -79,6 +93,7 @@ class Fetcher(object):
             else:
                 logging.error('[%d] %s, %r %.2fs', result['status_code'],
                               url, result['content'], result['time'])
+            result['status'] = 'success'
             return result
 
         def handle_error(error):
@@ -89,6 +104,7 @@ class Fetcher(object):
                 'time': time.time() - start_time,
                 'orig_url': url,
                 'url': url,
+                'status': 'error'
             }
             logging.error('[%d] %s, %r %.2fs',
                           result['status_code'], url, error, result['time'])
@@ -109,5 +125,3 @@ class Fetcher(object):
                 return handle_error(e)
         except Exception as e:
             return handle_error(e)
-
-
