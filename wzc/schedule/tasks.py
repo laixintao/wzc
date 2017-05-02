@@ -8,9 +8,9 @@ import logging
 
 from celery import Celery
 from wzc.spider import update_url
-from wzc.wzc.settings import BASE_URL, MAX_RETRY
+from wzc.wzc.settings import BASE_URL, MAX_RETRY, REDIS_SERVER
 
-wzc_spider = Celery('wzc', broker='redis://localhost')
+wzc_spider = Celery('wzc', broker=REDIS_SERVER)
 logger = logging.getLogger(__name__)
 
 @wzc_spider.task

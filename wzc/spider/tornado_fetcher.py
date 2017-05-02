@@ -59,6 +59,8 @@ class Fetcher(object):
 
     def check_need_update(self, url):
         page_info = page_table.find_one({'path': url})
+        if not page_info:
+            return True
         now_time = time.time()
         if now_time - page_info['last_update'] < MIN_UPDATE_TIME:
             logger.debug('trying to update url {}, but not out {}'.format(url, MIN_UPDATE_TIME))
@@ -109,7 +111,6 @@ class Fetcher(object):
             logging.error('[%d] %s, %r %.2fs',
                           result['status_code'], url, error, result['time'])
             return result
-
         try:
             request = tornado.httpclient.HTTPRequest(
                 url='%s' % self.phantomjs_proxy, method='POST',
