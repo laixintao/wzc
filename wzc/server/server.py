@@ -5,7 +5,8 @@ wzc_server
 """
 import BaseHTTPServer
 from wzc.storage import page_table
-from wzc.wzc.settings import HTML_PATH, IGNORE_PATH
+from wzc.wzc.settings import HTML_PATH, IGNORE_PATH, BASE_URL
+from wzc.schedule.tasks import update
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -25,6 +26,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def create_page(self):
         """get page content"""
         page_info = page_table.find_one({'path': self.path})
+        if not page_info:
+            update(BASE_URL + self.path)
+            page_info = page_table.find_one({'path': self.path})
         if page_info:
             filename = page_info['md5']
             with open('{}{}.html'.format(HTML_PATH, filename), 'r') as html_file:
